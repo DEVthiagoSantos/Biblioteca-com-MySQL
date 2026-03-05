@@ -2,11 +2,11 @@ package org.example.model;
 
 public class BookModel {
 
-    private int id_book;
+    private int idBook;
     private String author;
     private String title;
-    private int total_quantity;
-    private int quantity_available;
+    private int totalQuantity;
+    private int quantityAvailable;
 
     public BookModel() {}
 
@@ -16,8 +16,8 @@ public class BookModel {
                      int quantity_available) {
         this.author = author;
         this.title = title;
-        this.total_quantity = total_quantity;
-        this.quantity_available = quantity_available;
+        this.totalQuantity = total_quantity;
+        this.quantityAvailable = quantity_available;
     }
 
     public BookModel(String author,
@@ -27,17 +27,17 @@ public class BookModel {
                      int id_book) {
         this.author = author;
         this.title = title;
-        this.total_quantity = total_quantity;
-        this.quantity_available = quantity_available;
-        this.id_book = id_book;
+        this.totalQuantity = total_quantity;
+        this.quantityAvailable = quantity_available;
+        this.idBook = id_book;
     }
 
-    public int getId_book() {
-        return id_book;
+    public int getIdBook() {
+        return idBook;
     }
 
-    public void setId_book(int id_book) {
-        this.id_book = id_book;
+    public void setIdBook(int idBook) {
+        this.idBook = idBook;
     }
 
     public String getAuthor() {
@@ -56,19 +56,19 @@ public class BookModel {
         this.title = title;
     }
 
-    public int getTotal_quantity() {
-        return total_quantity;
+    public int getTotalQuantity() {
+        return totalQuantity;
     }
 
-    public void setTotal_quantity(int total_quantity) {
-        this.total_quantity = total_quantity;
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
     }
 
-    public int getQuantity_available() {
-        return quantity_available;
+    public int getQuantityAvailable() {
+        return quantityAvailable;
     }
 
-    public void setQuantity_available(int quantity_available) {
-        this.quantity_available = quantity_available;
+    public void setQuantityAvailable(int quantityAvailable) {
+        this.quantityAvailable = quantityAvailable;
     }
 }

@@ -14,14 +14,14 @@ import java.util.List;
 public class UserDAO {
 
     //CREATE
-    public void InsertUser(UserModel userModel) throws SQLException {
+    public void insert(UserModel userModel) throws SQLException {
 
         String sql = "INSERT INTO users (user_name, email) VALUES (?, ?)";
 
         try (Connection conn = Connect.connect();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, userModel.getUser_name());
+            stmt.setString(1, userModel.getUserName());
             stmt.setString(2, userModel.getEmail());
             stmt.executeUpdate();
 
@@ -29,7 +29,7 @@ public class UserDAO {
     }
 
     //ROAD
-    public List<UserModel> ListUsers() throws SQLException {
+    public List<UserModel> list() throws SQLException {
 
         String sql = "SELECT * FROM users";
         List<UserModel> list = new ArrayList<>();
@@ -50,7 +50,7 @@ public class UserDAO {
     }
 
     // ROAD - ID
-    public List<UserModel> searchById(int id) throws SQLException {
+    public List<UserModel> searchId(int id) throws SQLException {
 
         String sql = "SELECT * FROM users WHERE id_user = ?";
         List<UserModel> user = new ArrayList<>();
@@ -93,23 +93,23 @@ public class UserDAO {
     }
 
     // UPDATE
-    public void UserUpdate(UserModel user) throws SQLException {
+    public void update(UserModel user) throws SQLException {
 
         String sql = "UPDATE users SET user_name =?, email =? WHERE id_user =?";
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, user.getUser_name());
+            stmt.setString(1, user.getUserName());
             stmt.setString(2, user.getEmail());
-            stmt.setInt(3, user.getId_user());
+            stmt.setInt(3, user.getIdUser());
             stmt.executeUpdate();
 
         }
     }
 
     // DELETE
-    public void DeleteUser(int id) throws SQLException {
+    public void delete(int id) throws SQLException {
 
         String sql = "DELETE FROM users WHERE id_user = ?";
 
@@ -125,8 +125,8 @@ public class UserDAO {
     public static UserModel User(ResultSet rs) throws SQLException {
 
         UserModel user = new UserModel();
-        user.setId_user(rs.getInt("id_user"));
-        user.setUser_name(rs.getString("user_name"));
+        user.setIdUser(rs.getInt("id_user"));
+        user.setUserName(rs.getString("user_name"));
         user.setEmail(rs.getString("email"));
 
         return user;

@@ -11,7 +11,7 @@ public class UserService {
     UserDAO userDAO = new UserDAO();
 
     // Inserir usuario
-    public void insertUser(String nome, String email) throws SQLException {
+    public void insert(String nome, String email) throws SQLException {
 
         nome = nome.trim();
         email = email.trim();
@@ -24,31 +24,31 @@ public class UserService {
         }
 
         UserModel userModel = new UserModel(nome, email);
-        userDAO.InsertUser(userModel);
+        userDAO.insert(userModel);
     }
 
     // Listar todos os usuarios
-    public List<UserModel> listUsers() throws SQLException {
+    public List<UserModel> list() throws SQLException {
 
-        if (userDAO.ListUsers() == null) {
+        if (userDAO.list() == null) {
             throw new RuntimeException("Not users in list");
         }
 
-        return userDAO.ListUsers();
+        return userDAO.list();
     }
 
     // Listar o usuario pelo id dele
-    public List<UserModel> listIdUser(int id) throws SQLException {
+    public List<UserModel> listId(int id) throws SQLException {
 
-        if (userDAO.searchById(id) == null) {
+        if (userDAO.searchId(id) == null) {
             throw new RuntimeException("User not found");
         }
 
-        return userDAO.searchById(id);
+        return userDAO.searchId(id);
     }
 
     // Listar nomes dos usuarios
-    public List<UserModel> listUserName(String nome) throws SQLException {
+    public List<UserModel> listName(String nome) throws SQLException {
 
         nome = nome.trim();
         if (nome.isBlank() || !nome.matches("^[a-zA-ZÀ-ÿ ]+$")) {
@@ -59,7 +59,7 @@ public class UserService {
     }
 
     // Atualizar o usuario
-    public void updateUser(String name, String email, int idUser) throws SQLException {
+    public void update(String name, String email, int idUser) throws SQLException {
 
         name = name.trim();
         email = email.trim();
@@ -71,22 +71,22 @@ public class UserService {
                 || email.isBlank()) {
             throw new RuntimeException("Invalid email and cannot be blank");
         }
-        if (userDAO.searchById(idUser) == null) {
+        if (userDAO.searchId(idUser) == null) {
             throw new RuntimeException("User not found");
         }
 
         UserModel userModel = new UserModel(name, email, idUser);
-        userDAO.UserUpdate(userModel);
+        userDAO.update(userModel);
     }
 
     // Deletar um usuario do banco de dados
     public void deleteUser(int id) throws SQLException {
 
-        if (userDAO.searchById(id) == null) {
+        if (userDAO.searchId(id) == null) {
             throw new RuntimeException("User not found, it is not possible to delete");
         }
 
-        userDAO.DeleteUser(id);
+        userDAO.delete(id);
     }
 
 

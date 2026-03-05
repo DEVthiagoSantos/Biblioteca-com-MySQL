@@ -2,37 +2,37 @@ package org.example.model;
 
 public class UserModel {
     
-    private int id_user;
-    private String user_name;
+    private int idUser;
+    private String userName;
     private String email;
 
     public UserModel() {}
 
     public UserModel(String user_name, String email) {
-        this.user_name = user_name;
+        this.userName = user_name;
         this.email = email;
     }
 
     public UserModel(String user_name, String email, int id_user) {
-        this.id_user = id_user;
-        this.user_name = user_name;
+        this.idUser = id_user;
+        this.userName = user_name;
         this.email = email;
     }
 
-    public int getId_user() {
-        return id_user;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setId_user(int id_user) {
-        this.id_user = id_user;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getEmail() {
