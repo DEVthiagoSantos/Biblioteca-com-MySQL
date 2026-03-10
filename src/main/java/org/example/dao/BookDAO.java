@@ -53,7 +53,7 @@ public class BookDAO {
 
     // ROAD - ID
     public List<BookModel> searchID(int id) throws SQLException {
-        String sql = "SELECT * FROM books WHERE idBook = ?";
+        String sql = "SELECT * FROM books WHERE id_book = ?";
 
         List<BookModel> lista = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public class BookDAO {
     }
 
     // ROAD - Author
-    public List<BookModel> listAuthor(String name) throws SQLException {
+    public BookModel listAuthor(String name) throws SQLException {
 
         String sql = "SELECT * FROM books WHERE author LIKE ?";
 
@@ -83,7 +83,7 @@ public class BookDAO {
     }
 
     // ROAD - Title
-    public List<BookModel> listTitle(String name) throws SQLException {
+    public BookModel searchTitle(String name) throws SQLException {
 
         String sql = "SELECT * FROM books WHERE title LIKE ?";
 
@@ -96,8 +96,8 @@ public class BookDAO {
         String sql = """
                 UPDATE books SET author =?,
                                  title =?,
-                                 totalQuantity =?,
-                                 quantityAvailable =? WHERE idBook =?""";
+                                 total_quantity =?,
+                                 quantity_available =? WHERE id_book =?""";
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -111,10 +111,36 @@ public class BookDAO {
         }
     }
 
+    public void increaseQuantity(Connection conn, int idBook) throws SQLException {
+        String sql = """
+                UPDATE books
+                SET quantity_available = quantity_available + 1
+                WHERE id_book = ?""";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idBook);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void decreaseQuantity(Connection conn, int idBook) throws SQLException {
+        String sql = """
+                UPDATE books
+                SET quantity_available = quantity_available - 1
+                WHERE id_book = ?""";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idBook);
+            stmt.executeUpdate();
+        }
+    }
+
     // DELETE - ID
     public void delete(int id) throws SQLException {
 
-        String sql = "DELETE FROM books WHERE idBook = ?";
+        String sql = "DELETE FROM books WHERE id_book = ?";
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -124,8 +150,7 @@ public class BookDAO {
         }
     }
 
-    public static List<BookModel> getBookModel(String name, String sql) throws SQLException {
-        List<BookModel> list = new ArrayList<>();
+    public static BookModel getBookModel(String name, String sql) throws SQLException {
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -134,22 +159,22 @@ public class BookDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
 
-                while (rs.next()) {
-                    list.add(assembleList(rs));
+                if (rs.next()) {
+                    return assembleList(rs);
                 }
             }
         }
 
-        return list;
+        return null;
     }
 
     public static BookModel assembleList(ResultSet rs) throws SQLException {
         BookModel bookModel = new BookModel();
-        bookModel.setIdBook(rs.getInt("idBook"));
+        bookModel.setIdBook(rs.getInt("id_book"));
         bookModel.setAuthor(rs.getString("author"));
         bookModel.setTitle(rs.getString("title"));
-        bookModel.setTotalQuantity(rs.getInt("totalQuantity"));
-        bookModel.setQuantityAvailable(rs.getInt("quantityAvailable"));
+        bookModel.setTotalQuantity(rs.getInt("total_quantity"));
+        bookModel.setQuantityAvailable(rs.getInt("quantity_available"));
 
         return bookModel;
     }

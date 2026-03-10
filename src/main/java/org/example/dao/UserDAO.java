@@ -50,7 +50,7 @@ public class UserDAO {
     }
 
     // ROAD - ID
-    public List<UserModel> searchId(int id) throws SQLException {
+    public UserModel searchId(int id) throws SQLException {
 
         String sql = "SELECT * FROM users WHERE id_user = ?";
         List<UserModel> user = new ArrayList<>();
@@ -64,8 +64,7 @@ public class UserDAO {
 
                 if (rs.next()) {
 
-                    user.add(User(rs));
-                    return user;
+                    return User(rs);
 
                 }
             }
@@ -74,22 +73,25 @@ public class UserDAO {
     }
 
     // List Names
-    public List<UserModel> listNames(String name) throws SQLException {
+    public UserModel searchName(String name) throws SQLException {
+
         String sql = "SELECT * FROM users WHERE user_name LIKE ?";
-        List<UserModel> lista = new ArrayList<>();
+
+
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, name + "%");
             try (ResultSet rs = stmt.executeQuery()) {
 
-                while (rs.next()) {
-                    lista.add(User(rs));
+                if (rs.next()) {
+
+                    return User(rs);
                 }
             }
         }
 
-        return lista;
+        return null;
     }
 
     // UPDATE

@@ -38,7 +38,7 @@ public class UserService {
     }
 
     // Listar o usuario pelo id dele
-    public List<UserModel> listId(int id) throws SQLException {
+    public UserModel listId(int id) throws SQLException {
 
         if (userDAO.searchId(id) == null) {
             throw new RuntimeException("User not found");
@@ -48,14 +48,14 @@ public class UserService {
     }
 
     // Listar nomes dos usuarios
-    public List<UserModel> listName(String nome) throws SQLException {
+    public UserModel searchName(String nome) throws SQLException {
 
         nome = nome.trim();
         if (nome.isBlank() || !nome.matches("^[a-zA-ZÀ-ÿ ]+$")) {
             throw new RuntimeException("Error! name is invalid");
         }
 
-        return userDAO.listNames(nome);
+        return userDAO.searchName(nome);
     }
 
     // Atualizar o usuario

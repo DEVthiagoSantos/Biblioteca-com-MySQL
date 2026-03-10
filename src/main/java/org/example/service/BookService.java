@@ -56,8 +56,8 @@ public class BookService {
         return bookDao.searchID(idBook);
     }
 
-    // ROAD - NAME AUTHOR
-    public List<BookModel> listBookAuthor(String author) throws SQLException {
+    // AUTHOR
+    public BookModel bookAuthor(String author) throws SQLException {
 
         if (!author.matches("^[a-zA-ZÀ-ÿ ]+$")) {
             throw new RuntimeException("The author cannot have numbers in their name.");
@@ -68,16 +68,16 @@ public class BookService {
         return bookDao.listAuthor(author);
     }
 
-    // ROAD - TITLE
-    public List<BookModel> listBookTitle(String title) throws SQLException {
+    // TITLE
+    public BookModel bookTitle(String title) throws SQLException {
 
         if (title.isBlank()) {
             throw new RuntimeException("The title cannot be blank.");
-        } else if (bookDao.listTitle(title) == null) {
+        } else if (bookDao.searchTitle(title) == null) {
             throw new RuntimeException("This title is not on the shelf");
         }
 
-        return bookDao.listTitle(title);
+        return bookDao.searchTitle(title);
     }
 
     // Delete
@@ -95,7 +95,7 @@ public class BookService {
     public void verification(String author, String title
             , int total_quantity, int quantity_available) throws SQLException {
 
-        if (!author.matches("^[a-zA-ZÀ-ÿ ]+$") || author.isBlank()) {
+        if (!author.matches("^[a-zA-ZÀ-ÿ. ]+$") || author.isBlank()) {
             throw new RuntimeException("The author's name is invalid");
         } else if (title.isBlank()) {
             throw new RuntimeException("The title cannot be blank");

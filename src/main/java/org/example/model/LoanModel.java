@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 public class LoanModel {
 
     private int idLoan;
-    private int idUser;
-    private int idBook;
+    private UserModel user;
+    private BookModel book;
     private LocalDateTime loanDate;
     private LocalDateTime expected_return_date;
     private LocalDateTime actual_return_date;
@@ -16,27 +16,27 @@ public class LoanModel {
 
     public LoanModel() {}
 
-    public LoanModel(int id_user, int id_book, LocalDateTime expected_return_date) {
-        this.idUser = id_user;
-        this.idBook = id_book;
+    public LoanModel(UserModel id_user, BookModel id_book, LocalDateTime expected_return_date) {
+        this.user = id_user;
+        this.book = id_book;
         this.expected_return_date = expected_return_date;
     }
 
-    public LoanModel(int id_user, int id_book, LocalDateTime expected_return_date, int id_loan) {
-        this.idUser = id_user;
-        this.idBook = id_book;
+    public LoanModel(UserModel id_user, BookModel id_book, LocalDateTime expected_return_date, int id_loan) {
+        this.user = id_user;
+        this.book = id_book;
         this.idLoan = id_loan;
         this.expected_return_date = expected_return_date;
     }
 
-    public LoanModel(int idLoan, int idUser,
-                     int idBook, LocalDateTime loanDate,
+    public LoanModel(int idLoan, UserModel idUser,
+                     BookModel idBook, LocalDateTime loanDate,
                      LocalDateTime expected_return_date,
                      LocalDateTime actual_return_date,
                      Status status) {
         this.idLoan = idLoan;
-        this.idUser = idUser;
-        this.idBook = idBook;
+        this.user = idUser;
+        this.book = idBook;
         this.loanDate = loanDate;
         this.expected_return_date = expected_return_date;
         this.actual_return_date = actual_return_date;
@@ -51,20 +51,20 @@ public class LoanModel {
         this.idLoan = idLoan;
     }
 
-    public int getIdUser() {
-        return idUser;
+    public UserModel getUser() {
+        return user;
     }
 
-    public void setIdUser(int idUser) {
-        this.idUser = idUser;
+    public void setUser(UserModel user) {
+        this.user = user;
     }
 
-    public int getIdBook() {
-        return idBook;
+    public BookModel getBook() {
+        return book;
     }
 
-    public void setIdBook(int idBook) {
-        this.idBook = idBook;
+    public void setBook(BookModel book) {
+        this.book = book;
     }
 
     public LocalDateTime getLoanDate() {
