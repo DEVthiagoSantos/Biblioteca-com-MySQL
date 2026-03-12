@@ -73,10 +73,10 @@ public class UserDAO {
     }
 
     // List Names
-    public UserModel searchName(String name) throws SQLException {
+    public List<UserModel> searchNames(String name) throws SQLException {
 
         String sql = "SELECT * FROM users WHERE user_name LIKE ?";
-
+        List<UserModel> listNames = new ArrayList<>();
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -84,14 +84,28 @@ public class UserDAO {
             stmt.setString(1, name + "%");
             try (ResultSet rs = stmt.executeQuery()) {
 
-                if (rs.next()) {
+                while (rs.next()) {
 
-                    return User(rs);
+                    listNames.add(User(rs));
                 }
             }
         }
 
-        return null;
+        return listNames;
+    }
+
+    public UserModel searchName(String name) throws SQLException {
+
+        String sql = "SELECT * FROM users WHERE user_name LIKE ?";
+
+        return returnUser(name, sql);
+    }
+
+    public UserModel searchEmail(String email) throws SQLException {
+
+        String sql = "SELECT * FROM users WHERE email LIKE ?";
+
+        return returnUser(email, sql);
     }
 
     // UPDATE
@@ -132,5 +146,24 @@ public class UserDAO {
         user.setEmail(rs.getString("email"));
 
         return user;
+    }
+
+    // Montagem
+    public static UserModel returnUser(String string, String sql) throws SQLException {
+
+        try (Connection conn = Connect.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, string + "%");
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+
+                    return User(rs);
+                }
+            }
+        }
+
+        return null;
     }
 }

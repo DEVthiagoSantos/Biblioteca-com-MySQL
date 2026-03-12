@@ -4,6 +4,7 @@ import org.example.dao.BookDAO;
 import org.example.model.BookModel;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookService {
@@ -45,7 +46,7 @@ public class BookService {
     }
 
     // ROAD - ID
-    public List<BookModel> listBookID(int idBook) throws SQLException {
+    public BookModel listBookID(int idBook) throws SQLException {
 
         if (idBook <= 0) {
             throw new RuntimeException("ID cannot be less than or equal to 0.");

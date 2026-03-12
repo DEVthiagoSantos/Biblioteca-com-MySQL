@@ -3,6 +3,7 @@ package org.example.dao;
 import org.example.connection.Connect;
 import org.example.model.BookModel;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ public class BookDAO {
     public void insert(BookModel book) throws SQLException {
         String sql = """
                 INSERT INTO books
-                (author, title, totalQuantity, quantityAvailable)
+                (author, title, total_quantity, quantity_available)
                 VALUES (?, ?, ?, ?)""";
 
         try (Connection conn = Connect.connect();
@@ -52,10 +53,8 @@ public class BookDAO {
     }
 
     // ROAD - ID
-    public List<BookModel> searchID(int id) throws SQLException {
+    public BookModel searchID(int id) throws SQLException {
         String sql = "SELECT * FROM books WHERE id_book = ?";
-
-        List<BookModel> lista = new ArrayList<>();
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -65,8 +64,8 @@ public class BookDAO {
 
                 if (rs.next()) {
 
-                    lista.add(assembleList(rs));
-                    return lista;
+                    return assembleList(rs);
+
                 }
             }
         }
@@ -78,7 +77,6 @@ public class BookDAO {
     public BookModel listAuthor(String name) throws SQLException {
 
         String sql = "SELECT * FROM books WHERE author LIKE ?";
-
         return getBookModel(name, sql);
     }
 
@@ -152,6 +150,7 @@ public class BookDAO {
 
     public static BookModel getBookModel(String name, String sql) throws SQLException {
 
+
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -166,6 +165,25 @@ public class BookDAO {
         }
 
         return null;
+    }
+
+    public static List<BookModel> getListBooks(String name, String sql) throws SQLException {
+        List<BookModel> books = new ArrayList<>();
+
+        try (Connection conn = Connect.connect();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    books.add(assembleList(rs));
+                }
+            }
+        }
+
+        return books;
     }
 
     public static BookModel assembleList(ResultSet rs) throws SQLException {

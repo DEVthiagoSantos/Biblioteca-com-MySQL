@@ -5,6 +5,7 @@ import org.example.model.UserModel;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class UserService {
 
@@ -23,8 +24,13 @@ public class UserService {
             throw new RuntimeException("Invalid user email address");
         }
 
-        UserModel userModel = new UserModel(nome, email);
-        userDAO.insert(userModel);
+        UserModel user = userDAO.searchEmail(email);
+
+        if (user != null) {
+            throw new RuntimeException("Email already exists.");
+        }
+
+        userDAO.insert(user);
     }
 
     // Listar todos os usuarios
@@ -37,7 +43,7 @@ public class UserService {
         return userDAO.list();
     }
 
-    // Listar o usuario pelo id dele
+    // Listar o usuario pelo id dele, uma forma mais precisa de achar o usuario
     public UserModel listId(int id) throws SQLException {
 
         if (userDAO.searchId(id) == null) {
@@ -47,15 +53,21 @@ public class UserService {
         return userDAO.searchId(id);
     }
 
-    // Listar nomes dos usuarios
-    public UserModel searchName(String nome) throws SQLException {
+    // Listar usuarios pelo nome
+    public List<UserModel> searchNames(String nome) throws SQLException {
 
         nome = nome.trim();
         if (nome.isBlank() || !nome.matches("^[a-zA-ZÀ-ÿ ]+$")) {
             throw new RuntimeException("Error! name is invalid");
         }
 
-        return userDAO.searchName(nome);
+        List<UserModel> users = userDAO.searchNames(nome);
+
+        if (users.isEmpty()) {
+            throw new RuntimeException("No users found.");
+        }
+
+        return users;
     }
 
     // Atualizar o usuario
