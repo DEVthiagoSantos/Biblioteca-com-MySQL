@@ -8,7 +8,6 @@ import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
 
-import javax.management.relation.RelationNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -23,6 +22,8 @@ public class LoanService {
 
 
     public void createLoan(String userName, String bookTitle) throws SQLException {
+
+        updateLateLoans();
 
         userName = clearSpaces(userName);
         bookTitle = clearSpaces(bookTitle);
@@ -40,6 +41,9 @@ public class LoanService {
             throw new RuntimeException("Number of unavailable book");
         }
 
+        if (loanDAO.findActiveExists(user.getIdUser(), book.getIdBook())) {
+            throw new RuntimeException("This user already has this book.");
+        }
 
         try (Connection conn = Connect.connect()) {
 
@@ -65,7 +69,22 @@ public class LoanService {
         }
     }
 
+    public void updateLateLoans() throws SQLException {
+
+        Connection conn = Connect.connect();
+
+        List<LoanModel> loanModel = loanDAO.findLateLoans(conn);
+
+        for (LoanModel loan : loanModel) {
+
+            loanDAO.updateStatusLate(loan.getIdLoan(), "LATE");
+        }
+
+    }
+
     public void returnLoan(String userName, String bookTitle) throws SQLException {
+
+        updateLateLoans();
 
         userName = clearSpaces(userName);
         bookTitle = clearSpaces(bookTitle);
@@ -146,7 +165,7 @@ public class LoanService {
         loanDAO.update(user.getIdUser(), book.getIdBook(), loan.getIdLoan());
     }
 
-    public List<LoanModel> readLoan() throws SQLException {
+    public List<LoanModel> getAllLoans() throws SQLException {
 
         List<LoanModel> loan = loanDAO.readLoan();
 

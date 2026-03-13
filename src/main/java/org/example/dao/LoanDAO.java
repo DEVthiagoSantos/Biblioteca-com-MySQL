@@ -6,6 +6,7 @@ import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
 
+import javax.swing.text.html.HTMLDocument;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,6 +56,20 @@ public class LoanDAO {
         }
     }
 
+    public void updateStatusLate(int idLoan, String status) throws SQLException {
+
+        String sql = "UPDATE loans SET current_status = ? WHERE id_loan = ?";
+
+        try (Connection conn = Connect.connect();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status.toUpperCase());
+            stmt.setInt(2, idLoan);
+
+            stmt.executeUpdate();
+        }
+    }
+
     public void updateReturnDate(Connection conn, int id) throws SQLException {
 
         String sql = """
@@ -80,6 +95,32 @@ public class LoanDAO {
             stmt.setInt(1, idLoan);
             stmt.executeUpdate();
         }
+    }
+
+    public List<LoanModel> findLateLoans(Connection conn) throws SQLException {
+
+        String sql = """
+                SELECT id_loan FROM loans
+                WHERE expected_return_date < NOW()
+                AND current_status = 'LOANED'""";
+
+        List<LoanModel> lista = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+
+                    LoanModel loanModel = new LoanModel();
+                    loanModel.setIdLoan(rs.getInt("id_loan"));
+
+                    lista.add(loanModel);
+                }
+            }
+        }
+
+        return lista;
     }
 
     public LoanModel findActiveLoan(int idUser, int idBook) throws SQLException {
@@ -174,6 +215,28 @@ public class LoanDAO {
         return null;
     }
 
+    public boolean findActiveExists(int idUser, int idBook) throws SQLException {
+
+        String sql = """
+                SELECT 1 FROM loans
+                        WHERE id_user = ?
+                        AND id_book = ?
+                        AND current_status = 'LOANED'
+                LIMIT 1""";
+
+        try (Connection conn = Connect.connect();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUser);
+            stmt.setInt(2, idBook);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                return rs.next();
+            }
+        }
+    }
+
     public List<LoanModel> readLoan() throws SQLException {
 
         String sql = """
@@ -208,6 +271,8 @@ public class LoanDAO {
     }
 
     // Contagem total de quantos usuarios tem em cada livro
+    /* Esse metodo está fazendo a lista dos livros e quantas pessoas tem ele.
+    * Mas! tem um erro, ele vai listar até aqueles que já foram retornados. */
     public Map<String, Integer> countNumberLoans() throws SQLException {
 
         String sql = """
@@ -216,7 +281,9 @@ public class LoanDAO {
                 FROM loans
                 INNER JOIN users ON loans.id_user = users.id_user
                 INNER JOIN books ON loans.id_book = books.id_book
-                GROUP BY books.title""";
+                WHERE loans.current_status = 'LOANED'
+                GROUP BY books.title"""; /* Vou por a consulta para pegar apenas
+                 aqueles que ainda estão emprestados */
         Map<String, Integer> mapa = new LinkedHashMap<>();
 
         try (Connection conn = Connect.connect();

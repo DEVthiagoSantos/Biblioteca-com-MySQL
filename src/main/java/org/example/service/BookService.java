@@ -4,8 +4,8 @@ import org.example.dao.BookDAO;
 import org.example.model.BookModel;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class BookService {
 
@@ -33,6 +33,18 @@ public class BookService {
         BookModel bookModel = new BookModel(author, title,
                 total_quantity, quantity_available, idBook);
         bookDao.update(bookModel);
+    }
+
+    // SEARCH - AUTHOR
+    public Map<String, Integer> searchBookByAuthor(String author) throws SQLException {
+
+        Map<String, Integer> mapa = bookDao.searchBookByAuthor(author);
+
+        if (mapa.isEmpty()) {
+            throw new RuntimeException("There is no information about is author.");
+        }
+
+        return mapa;
     }
 
     // ROAD

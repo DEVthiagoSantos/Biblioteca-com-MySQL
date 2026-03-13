@@ -5,6 +5,7 @@ import org.example.service.BookService;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class BookController {
 
@@ -34,6 +35,11 @@ public class BookController {
     public BookModel getBookById(int idBook) throws SQLException {
 
         return bookService.listBookID(idBook);
+    }
+
+    public Map<String, Integer> searchBooksByAuthor(String author) throws SQLException {
+
+        return bookService.searchBookByAuthor(author);
     }
 
     public void deleteBookById(int idBook) throws SQLException {
