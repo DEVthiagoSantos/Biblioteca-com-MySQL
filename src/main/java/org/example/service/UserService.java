@@ -30,7 +30,9 @@ public class UserService {
             throw new RuntimeException("Email already exists.");
         }
 
-        userDAO.insert(user);
+        UserModel userModel = new UserModel(nome, email);
+
+        userDAO.insert(userModel);
     }
 
     // Listar todos os usuarios
