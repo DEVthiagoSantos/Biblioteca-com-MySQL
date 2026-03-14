@@ -36,9 +36,9 @@ public class BookService {
     }
 
     // SEARCH - AUTHOR
-    public Map<String, Integer> searchBookByAuthor(String author) throws SQLException {
+    public Map<String, Integer> searchBookByTitle(String title) throws SQLException {
 
-        Map<String, Integer> mapa = bookDao.searchBookByAuthor(author);
+        Map<String, Integer> mapa = bookDao.searchBookByTitle(title);
 
         if (mapa.isEmpty()) {
             throw new RuntimeException("There is no information about is author.");

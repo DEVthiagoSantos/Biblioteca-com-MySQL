@@ -37,9 +37,9 @@ public class BookController {
         return bookService.listBookID(idBook);
     }
 
-    public Map<String, Integer> searchBooksByAuthor(String author) throws SQLException {
+    public Map<String, Integer> searchBooksByTitle(String title) throws SQLException {
 
-        return bookService.searchBookByAuthor(author);
+        return bookService.searchBookByTitle(title);
     }
 
     public void deleteBookById(int idBook) throws SQLException {

@@ -75,23 +75,23 @@ public class BookDAO {
     }
 
     // SEARCH - AUTHOR
-    public Map<String, Integer> searchBookByAuthor(String author) throws SQLException {
+    public Map<String, Integer> searchBookByTitle(String title) throws SQLException {
 
-        String sql = "SELECT * FROM books WHERE author LIKE ?";
+        String sql = "SELECT * FROM books WHERE title LIKE ?";
         Map<String, Integer> mapa = new LinkedHashMap<>();
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, author + "%");
+            stmt.setString(1, "%" + title + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
 
                     mapa.put(
-                            rs.getString("author"),
-                            rs.getInt("quantity_available")
+                            rs.getString("title"),
+                            rs.getInt("id_book")
                     );
                 }
             }

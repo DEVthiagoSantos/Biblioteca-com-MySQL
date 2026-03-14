@@ -4,14 +4,15 @@ import org.example.Enum.EstadoMenu;
 import org.example.controller.BookController;
 import org.example.controller.LoanController;
 import org.example.controller.UserController;
+import org.example.model.BookModel;
 import org.example.model.UserModel;
 import org.example.service.BookService;
 import org.example.service.LoanService;
 import org.example.service.UserService;
 
-import java.security.spec.RSAOtherPrimeInfo;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -128,15 +129,20 @@ public class Main {
         switch (opcao) {
 
             case 1 :
-                // Cadastrar Livro
+                insertBook();
+                break;
             case 2 :
-                // Listar Livros
+                getAllBooks();
+                break;
             case 3 :
-                // Atualizar livros
+                updateBook();
+                break;
             case 4 :
-                // Buscar Livro (ID)
+                getBookByID();
+                break;
             case 5 :
-                // Buscar Livros (Nome)
+                getBooksByTitle();
+                break;
             case 6 :
                 return EstadoMenu.USERS;
             case 7 :
@@ -265,6 +271,123 @@ public class Main {
                 System.out.println("Nome: " + users.getUserName());
                 System.out.println("Email: " + users.getEmail());
             }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // METODOS DOS LIVROS
+
+    public static void insertBook() throws SQLException {
+
+        try {
+            System.out.print("Autor do Livro: ");
+            String author = input.nextLine();
+            System.out.print("Titulo do Livro: ");
+            String title = input.nextLine();
+            System.out.print("Quantos no total: ");
+            int totalQuantity = Integer.parseInt(input.nextLine());
+            System.out.println("Quantos disponíveis: ");
+            int quantityAvailable = Integer.parseInt(input.nextLine());
+
+            books.insertBook(author, title, totalQuantity, quantityAvailable);
+            System.out.println("Livro inserido com sucesso.");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void getAllBooks() throws SQLException {
+
+        try {
+
+            for (BookModel book : books.getAllBooks()) {
+
+                linha();
+                String resultBook = """
+                    ID: %d
+                    Titulo: %s
+                    Autor: %s
+                    Quantidade Total: %d
+                    Quantidade Disponível: %d""".formatted(book.getIdBook(),
+                        book.getTitle(), book.getAuthor(), book.getTotalQuantity(),
+                        book.getQuantityAvailable());
+                System.out.println(resultBook);
+
+            }
+
+        } catch (Exception e) {
+
+            System.out.println(e.getMessage());
+
+        }
+    }
+
+    public static void updateBook() throws SQLException {
+
+        try {
+
+            System.out.println("ID do livro que deseja atualizar ou alterar.");
+            System.out.print("ID: ");
+            int idBook = Integer.parseInt(input.nextLine());
+            System.out.println("Ok.. Agora atualize ou altere o livro");
+
+            System.out.print("Autor: ");
+            String author = input.nextLine();
+            System.out.print("Titulo: ");
+            String title = input.nextLine();
+
+            System.out.print("Quantos no total: ");
+            int totalQuantity = Integer.parseInt(input.nextLine());
+            System.out.print("Quantos disponíveis: ");
+            int quantityAvailable = Integer.parseInt(input.nextLine());
+
+            books.updateBook(author, title, totalQuantity, quantityAvailable, idBook);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void getBookByID() throws SQLException {
+
+        try {
+            System.out.print("ID: ");
+            int idBook = Integer.parseInt(input.nextLine());
+
+            BookModel bookModel = books.getBookById(idBook);
+            linha();
+            String bookResult = """
+                    ID: %d
+                    Titulo: %s
+                    Autor: %s
+                    Quantidade Total: %d
+                    Quantidade Disponível: %d""".formatted(bookModel.getIdBook(),
+                    bookModel.getTitle(), bookModel.getAuthor(), bookModel.getTotalQuantity(),
+                    bookModel.getTotalQuantity());
+            System.out.println(bookResult);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void getBooksByTitle() throws SQLException {
+
+        try {
+
+            System.out.print("Titulo do Livro: ");
+            String author = input.nextLine();
+
+            Map<String, Integer> mapa = books.searchBooksByTitle(author);
+
+            for (Map.Entry<String, Integer> entry : mapa.entrySet()){
+
+                System.out.println("Titulo: " + entry.getKey());
+                System.out.println("ID: " + entry.getValue());
+
+            }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
