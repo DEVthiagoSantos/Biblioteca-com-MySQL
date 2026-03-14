@@ -143,7 +143,7 @@ public class LoanDAO {
         return returnLoan(idUser, idBook, sql);
     }
 
-    public List<LoanModel> findLoansByUser(int idUser) throws SQLException {
+    public List<LoanModel> findLoansByUser(String userName) throws SQLException {
 
         String sql = """
                 SELECT loans.id_loan AS ID_Loan,
@@ -159,25 +159,24 @@ public class LoanDAO {
                 FROM loans
                 INNER JOIN users ON loans.id_user = users.id_user
                 INNER JOIN books ON loans.id_book = books.id_book
-                WHERE users.id_user = ?""";
+                WHERE users.user_name LIKE ?""";
         List<LoanModel> list = new ArrayList<>();
 
         try (Connection conn = Connect.connect();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, idUser);
+            stmt.setString(1, userName + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
 
-                if (rs.next()) {
+                while (rs.next()) {
 
                     list.add(mapLoan(rs));
-                    return list;
                 }
             }
         }
 
-        return null;
+        return list;
     }
 
     public LoanModel searchLoan(int idLoan) throws SQLException {

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.SplittableRandom;
 
 public class LoanService {
 
@@ -123,6 +124,8 @@ public class LoanService {
 
     public void deleteLoan(String userName, String bookTitle) throws SQLException {
 
+        updateLateLoans();
+
         userName = clearSpaces(userName);
         bookTitle = clearSpaces(bookTitle);
 
@@ -146,6 +149,8 @@ public class LoanService {
     // UPDATE LOAN
     public void updateLoan(String userName, String bookTitle, int idLoan) throws SQLException {
 
+        updateLateLoans();
+
         userName = clearSpaces(userName);
         bookTitle = clearSpaces(bookTitle);
 
@@ -167,6 +172,8 @@ public class LoanService {
 
     public List<LoanModel> getAllLoans() throws SQLException {
 
+        updateLateLoans();
+
         List<LoanModel> loan = loanDAO.readLoan();
 
         if (loan.isEmpty()) {
@@ -176,9 +183,11 @@ public class LoanService {
         return loan;
     }
 
-    public List<LoanModel> findLoansByUser(int idUser) throws SQLException {
+    public List<LoanModel> findLoansByUser(String userName) throws SQLException {
 
-        List<LoanModel> loan = loanDAO.findLoansByUser(idUser);
+        updateLateLoans();
+
+        List<LoanModel> loan = loanDAO.findLoansByUser(userName);
 
         if (loan.isEmpty()) {
             throw new RuntimeException("This user has no loans");
@@ -187,7 +196,22 @@ public class LoanService {
         return loan;
     }
 
+    public LoanModel searchLoanId(int idLoan) throws SQLException {
+
+        updateLateLoans();
+
+        LoanModel loan = loanDAO.searchLoan(idLoan);
+
+        if (loan == null) {
+            throw new RuntimeException("This loan not registered");
+        }
+
+        return loan;
+    }
+
     public Map<String, Integer> countLoans() throws SQLException {
+
+        updateLateLoans();
 
         Map<String, Integer> mapa = loanDAO.countNumberLoans();
 

@@ -40,6 +40,16 @@ public class LoanController {
         return loanService.countLoans();
     }
 
+    public List<LoanModel> getLoanByUser(String userName) throws SQLException {
+
+        return loanService.findLoansByUser(userName);
+    }
+
+    public LoanModel getLoanById(int idLoan) throws SQLException {
+
+        return loanService.searchLoanId(idLoan);
+    }
+
     public void deleteLoan(String userName, String bookTitle) throws SQLException {
 
         loanService.deleteLoan(userName, bookTitle);
