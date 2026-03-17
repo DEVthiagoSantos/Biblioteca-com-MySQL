@@ -19,55 +19,55 @@ public class Main {
 
         Scanner input = new Scanner(System.in);
 
-       while (true) {
+        while (true) {
 
-            String menu = """
-                =============================
-                [ 1 ] Login User
-                [ 2 ] Login Admin
-                [ 3 ] sair""";
-            System.out.println(menu);
+                String menu = """
+                    =============================
+                    [ 1 ] Login User
+                    [ 2 ] Login Admin
+                    [ 3 ] sair""";
 
-            System.out.print("Escolha: ");
-            int opcao = Integer.parseInt(input.nextLine());
+                System.out.println(menu);
 
-            if (opcao == 1) {
-                System.out.print("ID do usuário: ");
-                int idUser = Integer.parseInt(input.nextLine());
-                try {
+                System.out.print("Escolha: ");
+                int opcao = Integer.parseInt(input.nextLine());
 
-                    UserModel userModel = users.searchUserById(idUser);
+                if (opcao == 1) {
+                        System.out.print("ID do usuário: ");
+                        int idUser = Integer.parseInt(input.nextLine());
+                        try {
 
-                    if (userModel != null) {
-                        MenuUser user = new MenuUser(idUser);
-                        user.runSystem();
-                    } else {
-                        System.out.println("Usuário não existe.");
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                            UserModel userModel = users.searchUserById(idUser);
+
+                            if (userModel != null) {
+                                MenuUser user = new MenuUser(idUser);
+                                user.runSystem();
+                            } else {
+                                System.out.println("Usuário não existe.");
+                            }
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+
+                } else if (opcao == 2) {
+
+                        System.out.print("Senha do Admin: ");
+                        String senhaCorreta = "3131";
+                        // Vou mudar a senha apenas para demonstração kkkk
+                        String senha = input.nextLine();
+
+                        if (senha.equals(senhaCorreta)) {
+                            MenuAdmin menuAdmin = new MenuAdmin();
+                            menuAdmin.runSystem();
+                        } else {
+                            System.out.println("Senha Incorreta.");
+                        }
+
+                } else if (opcao == 3) {
+                        break;
                 }
 
-            } else if (opcao == 2) {
-
-                System.out.print("Senha do Admin: ");
-                String senhaCorreta = System.getenv("DB_PASSWORD");
-                String senha = input.nextLine();
-
-                if (senha.equals(senhaCorreta)) {
-                    MenuAdmin menuAdmin = new MenuAdmin();
-                    menuAdmin.runSystem();
-                } else {
-                    System.out.println("Senha Incorreta.");
-                }
-
-            } else if (opcao == 3) {
-                break;
-            }
         }
-
-
-
     }
 
 }

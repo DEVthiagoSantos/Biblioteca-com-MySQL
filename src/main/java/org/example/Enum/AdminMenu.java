@@ -1,6 +1,6 @@
 package org.example.Enum;
 
-public enum EstadoMenu {
+public enum AdminMenu {
     USERS,
     BOOKS,
     LOANS,

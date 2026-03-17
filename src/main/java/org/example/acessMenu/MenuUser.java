@@ -1,75 +1,47 @@
 package org.example.acessMenu;
 
 import org.example.Enum.UserMenu;
-import org.example.controller.BookController;
 import org.example.controller.LoanController;
 import org.example.controller.UserController;
-import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
-import org.example.service.BookService;
 import org.example.service.LoanService;
 import org.example.service.UserService;
 
-import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class MenuUser {
 
-    private static int userModel;
+    private static int userId;
 
-    public MenuUser(int userModel) {
-        this.userModel = userModel;
+    public MenuUser(int userId) {
+        MenuUser.userId = userId;
     }
 
     static UserService userService = new UserService();
-    static BookService bookService = new BookService();
     static LoanService loanService = new LoanService();
     static UserController users = new UserController(userService);
-    static BookController books = new BookController(bookService);
     static LoanController loans = new LoanController(loanService);
 
 
     public static Scanner input = new Scanner(System.in);
 
-    static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
     static void linha() {
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     }
 
-    static String returnActualDate(LoanModel data) throws SQLException {
+    static String valueBalance(BigDecimal value) {
 
-        if (data.getActual_return_date() == null) {
-            return "Ainda não retornado.";
-        } else {
-            return data.getActual_return_date().format(formatter);
-        }
+        BigDecimal form = value.setScale(2, RoundingMode.HALF_UP);
+        DecimalFormat fr = new DecimalFormat("###,##0.00");
+
+        return fr.format(form);
     }
 
-    static void getLoan(LoanModel loan) throws SQLException {
-
-        String data = returnActualDate(loan);
-        String resultLoans = """
-                        ID: %d
-                        Usuário: %s
-                        Livro: %s
-                        Data do Empréstimo: %s
-                        Data Limite de Retorno: %s
-                        Data de Retorno: %s
-                        Status: %s""".formatted(loan.getIdLoan(),
-                loan.getUser().getUserName(), loan.getBook().getTitle(),
-                loan.getLoanDate().format(formatter),
-                loan.getExpected_return_date().format(formatter),
-                data,
-                loan.getStatus());
-        linha();
-        System.out.println(resultLoans);
-    }
-
-    public static UserMenu menuUsers() throws SQLException {
+    public static UserMenu menuUsers()  {
 
         String menuUser = """
                 ============== Menu ================
@@ -81,7 +53,8 @@ public class MenuUser {
                 [ 6 ] Listar Todos os Livros
                 [ 7 ] Fazer Empréstimo
                 [ 8 ] Retornar Empréstimo
-                [ 9 ] Sair""";
+                [ 9 ] Depositar
+                [ 10 ] Sair""";
 
         System.out.println(menuUser);
 
@@ -91,7 +64,7 @@ public class MenuUser {
         return executarUsers(opcao);
     }
 
-    public static UserMenu executarUsers(int opcao) throws SQLException {
+    public static UserMenu executarUsers(int opcao)  {
 
         switch (opcao) {
 
@@ -105,13 +78,13 @@ public class MenuUser {
                 updateUser();
                 break;
             case 4 :
-                getBookByID();
+                MenuAdmin.getBookByID();
                 break;
             case 5 :
-                getBooksByTitle();
+                MenuAdmin.getBooksByTitle();
                 break;
             case 6 :
-                getAllBooks();
+                MenuAdmin.getAllBooks();
                 break;
             case 7 :
                 createLoan();
@@ -120,6 +93,9 @@ public class MenuUser {
                 returnLoan();
                 break;
             case 9 :
+                depositeBalance();
+                break;
+            case 10 :
                 return UserMenu.SAIR;
         }
 
@@ -128,14 +104,14 @@ public class MenuUser {
 
     // Metodos do Usuario
 
-    public static void updateUser() throws SQLException {
+    public static void updateUser() {
 
         try {
             System.out.print("Nome do Usuário: ");
             String nome = input.nextLine();
             System.out.print("Email: ");
             String email = input.nextLine();
-            users.updateUser(nome, email, userModel);
+            users.updateUser(nome, email, userId);
 
             System.out.println("Usuário atualizado");
 
@@ -144,16 +120,18 @@ public class MenuUser {
         }
     }
 
-    public static void searchUserByID() throws SQLException {
+    public static void searchUserByID() {
 
         try {
 
-            UserModel user = users.searchUserById(userModel);
+            UserModel user = users.searchUserById(userId);
             String resultUser = """
                     ID: %d
                     Nome: %s
-                    Email: %s""".formatted(user.getIdUser(),
-                    user.getUserName(), user.getEmail());
+                    Email: %s
+                    Saldo: R$ %s""".formatted(user.getIdUser(),
+                    user.getUserName(), user.getEmail(),
+                    valueBalance(user.getAvailableBalance()));
             linha();
             System.out.println(resultUser);
 
@@ -163,85 +141,12 @@ public class MenuUser {
         }
     }
 
-    // METODOS DOS LIVROS
-
-    public static void getAllBooks() throws SQLException {
-
-        try {
-
-            for (BookModel book : books.getAllBooks()) {
-
-                linha();
-                String resultBook = """
-                    ID: %d
-                    Titulo: %s
-                    Autor: %s
-                    Quantidade Total: %d
-                    Quantidade Disponível: %d""".formatted(book.getIdBook(),
-                        book.getTitle(), book.getAuthor(), book.getTotalQuantity(),
-                        book.getQuantityAvailable());
-                System.out.println(resultBook);
-
-            }
-
-        } catch (Exception e) {
-
-            System.out.println(e.getMessage());
-
-        }
-    }
-
-    public static void getBookByID() throws SQLException {
-
-        try {
-            System.out.println("Digite o ID do livro");
-            System.out.print("ID: ");
-            int idBook = Integer.parseInt(input.nextLine());
-
-            BookModel bookModel = books.getBookById(idBook);
-            linha();
-            String bookResult = """
-                    ID: %d
-                    Titulo: %s
-                    Autor: %s
-                    Quantidade Total: %d
-                    Quantidade Disponível: %d""".formatted(bookModel.getIdBook(),
-                    bookModel.getTitle(), bookModel.getAuthor(), bookModel.getTotalQuantity(),
-                    bookModel.getTotalQuantity());
-            System.out.println(bookResult);
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void getBooksByTitle() throws SQLException {
-
-        try {
-
-            System.out.print("Titulo do Livro: ");
-            String author = input.nextLine();
-
-            Map<String, Integer> mapa = books.searchBooksByTitle(author);
-
-            for (Map.Entry<String, Integer> entry : mapa.entrySet()){
-
-                System.out.println("Titulo: " + entry.getKey());
-                System.out.println("ID: " + entry.getValue());
-
-            }
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     // Metodos de empréstimo
-    public static void createLoan() throws SQLException {
+    public static void createLoan() {
 
         try {
 
-            UserModel user = users.searchUserById(userModel);
+            UserModel user = users.searchUserById(userId);
             System.out.print("Titulo do Livro: ");
             String titulo = input.nextLine();
 
@@ -255,11 +160,11 @@ public class MenuUser {
         }
     }
 
-    public static void returnLoan() throws SQLException {
+    public static void returnLoan() {
 
         try {
 
-            UserModel user = users.searchUserById(userModel);
+            UserModel user = users.searchUserById(userId);
             System.out.print("Livro: ");
             String livro = input.nextLine();
 
@@ -272,17 +177,30 @@ public class MenuUser {
         }
     }
 
-    public static void getLoanByUser() throws SQLException {
+    public static void getLoanByUser(){
 
         try {
 
-            for (LoanModel loan : loans.getLoanByUser(users.searchUserById(userModel)
+            for (LoanModel loan : loans.getLoanByUser(users.searchUserById(userId)
                     .getUserName())) {
 
-                getLoan(loan);
+                MenuAdmin.getLoan(loan);
 
             }
 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void depositeBalance(){
+
+        try {
+
+            System.out.println("Inserir valor: ");
+            double value = Double.parseDouble(input.nextLine());
+            users.depositBalance(value, userId);
+            System.out.println("Deposito feito com sucesso.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

@@ -1,10 +1,13 @@
 package org.example.model;
 
+import java.math.BigDecimal;
+
 public class UserModel {
     
     private int idUser;
     private String userName;
     private String email;
+    private BigDecimal availableBalance;
 
     public UserModel() {}
 
@@ -41,5 +44,13 @@ public class UserModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+
+    public void setAvailableBalance(BigDecimal availableBalance) {
+        this.availableBalance = availableBalance;
     }
 }

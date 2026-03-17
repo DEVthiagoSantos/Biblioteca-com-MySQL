@@ -3,6 +3,8 @@ package org.example.service;
 import org.example.dao.UserDAO;
 import org.example.model.UserModel;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -91,6 +93,26 @@ public class UserService {
 
         UserModel userModel = new UserModel(name, email, idUser);
         userDAO.update(userModel);
+    }
+
+    public void depositBalance(double value, int idUser) throws SQLException {
+
+        if (value <= 0) {
+            throw new RuntimeException("This value is invalid");
+        } else if (idUser <= 0) {
+            throw new RuntimeException("ID invalid");
+        }
+
+        UserModel user = userDAO.searchId(idUser);
+
+        if (user == null) {
+            throw new RuntimeException("This user is not registered");
+        }
+
+        BigDecimal value2 = new BigDecimal(String.valueOf(user.getAvailableBalance()))
+                .add(BigDecimal.valueOf(value));
+
+        userDAO.depositBalance(value2, idUser);
     }
 
     // Deletar um usuario do banco de dados

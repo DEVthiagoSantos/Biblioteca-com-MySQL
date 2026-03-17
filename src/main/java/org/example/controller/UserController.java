@@ -39,6 +39,11 @@ public class UserController {
         userService.update(userName, email, idUser);
     }
 
+    public void depositBalance(double value, int idUser) throws SQLException {
+
+        userService.depositBalance(value, idUser);
+    }
+
     public void deleteUser(int idUser) throws SQLException {
 
         userService.deleteUser(idUser);

@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.Enum.Status;
 import org.example.connection.Connect;
 import org.example.dao.BookDAO;
 import org.example.dao.LoanDAO;
@@ -8,9 +9,12 @@ import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.SplittableRandom;
@@ -20,6 +24,8 @@ public class LoanService {
     private final LoanDAO loanDAO = new LoanDAO();
     private final BookDAO bookDAO = new BookDAO();
     private final UserDAO userDAO = new UserDAO();
+
+    private final static BigInteger DAYS_LATE_FEE = BigInteger.valueOf(2);
 
 
     public void createLoan(String userName, String bookTitle) throws SQLException {
@@ -78,7 +84,8 @@ public class LoanService {
 
         for (LoanModel loan : loanModel) {
 
-            loanDAO.updateStatusLate(loan.getIdLoan(), "LATE");
+            loanDAO.updateStatusLate(conn, loan.getIdLoan(), Status.LATE);
+
         }
 
     }

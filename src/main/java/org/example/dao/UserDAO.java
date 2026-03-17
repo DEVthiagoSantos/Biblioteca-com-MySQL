@@ -4,6 +4,7 @@ package org.example.dao;
 import org.example.connection.Connect;
 import org.example.model.UserModel;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -124,6 +125,19 @@ public class UserDAO {
         }
     }
 
+    public void depositBalance(BigDecimal value, int idUser) throws SQLException {
+
+        String sql = "UPDATE users SET available_balance = ? WHERE id_user = ?";
+
+        try (Connection conn = Connect.connect();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBigDecimal(1, value);
+            stmt.setInt(2, idUser);
+            stmt.executeUpdate();
+        }
+    }
+
     // DELETE
     public void delete(int id) throws SQLException {
 
@@ -144,6 +158,7 @@ public class UserDAO {
         user.setIdUser(rs.getInt("id_user"));
         user.setUserName(rs.getString("user_name"));
         user.setEmail(rs.getString("email"));
+        user.setAvailableBalance(rs.getBigDecimal("available_balance"));
 
         return user;
     }

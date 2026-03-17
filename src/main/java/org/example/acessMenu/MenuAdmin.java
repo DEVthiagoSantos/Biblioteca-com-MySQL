@@ -1,6 +1,6 @@
 package org.example.acessMenu;
 
-import org.example.Enum.EstadoMenu;
+import org.example.Enum.AdminMenu;
 import org.example.controller.BookController;
 import org.example.controller.LoanController;
 import org.example.controller.UserController;
@@ -11,7 +11,6 @@ import org.example.service.BookService;
 import org.example.service.LoanService;
 import org.example.service.UserService;
 
-import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Scanner;
@@ -33,7 +32,7 @@ public class MenuAdmin {
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     }
 
-    static String returnActualDate(LoanModel data) throws SQLException {
+    static String returnActualDate(LoanModel data) {
 
         if (data.getActual_return_date() == null) {
             return "Ainda não retornado.";
@@ -42,27 +41,27 @@ public class MenuAdmin {
         }
     }
 
-    static void getLoan(LoanModel loan) throws SQLException {
+    public static void getLoan(LoanModel loan) {
 
         String data = returnActualDate(loan);
         String resultLoans = """
-                        ID: %d
-                        Usuário: %s
-                        Livro: %s
-                        Data do Empréstimo: %s
-                        Data Limite de Retorno: %s
-                        Data de Retorno: %s
-                        Status: %s""".formatted(loan.getIdLoan(),
+                    ID: %d
+                    Usuário: %s
+                    Livro: %s
+                    Data do Empréstimo: %s
+                    Data Limite de Retorno: %s
+                    Data de Retorno: %s
+                    Status: %s""".formatted(loan.getIdLoan(),
                 loan.getUser().getUserName(), loan.getBook().getTitle(),
                 loan.getLoanDate().format(formatter),
                 loan.getExpected_return_date().format(formatter),
-                data,
-                loan.getStatus());
+                data, loan.getStatus());
+
         linha();
         System.out.println(resultLoans);
     }
 
-    public static EstadoMenu menuUsers() throws SQLException {
+    public static AdminMenu menuUsers() {
 
         String menuUser = """
                 ============== USERS ================
@@ -83,7 +82,7 @@ public class MenuAdmin {
         return executarUsers(opcao);
     }
 
-    public static EstadoMenu menuBooks() throws SQLException {
+    public static AdminMenu menuBooks() {
 
         String menuBooks = """
                 ============== BOOKS ================
@@ -104,7 +103,7 @@ public class MenuAdmin {
         return executarBooks(opcao);
     }
 
-    public static EstadoMenu menuLoans() throws SQLException {
+    public static AdminMenu menuLoans() {
 
         String menuLoans = """
                 ============== LOANS ================
@@ -126,7 +125,7 @@ public class MenuAdmin {
         return executarLoan(opcao);
     }
 
-    public static EstadoMenu executarUsers(int opcao) throws SQLException {
+    public static AdminMenu executarUsers(int opcao) {
 
         switch (opcao) {
 
@@ -146,17 +145,17 @@ public class MenuAdmin {
                 searchUserByName();
                 break;
             case 6 :
-                return EstadoMenu.BOOKS;
+                return AdminMenu.BOOKS;
             case 7 :
-                return EstadoMenu.LOANS;
+                return AdminMenu.LOANS;
             case 8 :
-                return EstadoMenu.SAIR;
+                return AdminMenu.SAIR;
         }
 
-        return EstadoMenu.USERS;
+        return AdminMenu.USERS;
     }
 
-    public static EstadoMenu executarBooks(int opcao) throws SQLException {
+    public static AdminMenu executarBooks(int opcao) {
 
         switch (opcao) {
 
@@ -176,17 +175,17 @@ public class MenuAdmin {
                 getBooksByTitle();
                 break;
             case 6 :
-                return EstadoMenu.USERS;
+                return AdminMenu.USERS;
             case 7 :
-                return EstadoMenu.LOANS;
+                return AdminMenu.LOANS;
             case 8 :
-                return EstadoMenu.SAIR;
+                return AdminMenu.SAIR;
         }
 
-        return EstadoMenu.BOOKS;
+        return AdminMenu.BOOKS;
     }
 
-    public static EstadoMenu executarLoan(int opcao) throws SQLException {
+    public static AdminMenu executarLoan(int opcao)  {
 
         switch (opcao) {
 
@@ -210,18 +209,18 @@ public class MenuAdmin {
             case 7 :
                 // Consultas
             case 8 :
-                return EstadoMenu.USERS;
+                return AdminMenu.USERS;
             case 9 :
-                return EstadoMenu.BOOKS;
+                return AdminMenu.BOOKS;
             case 10 :
-                return EstadoMenu.SAIR;
+                return AdminMenu.SAIR;
         }
 
-        return EstadoMenu.LOANS;
+        return AdminMenu.LOANS;
     }
 
     // Metodos do Usuario
-    public static void createUser() throws SQLException {
+    public static void createUser() {
 
         try {
 
@@ -239,7 +238,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getAllUsers() throws SQLException {
+    public static void getAllUsers() {
 
         try {
 
@@ -249,6 +248,7 @@ public class MenuAdmin {
                 System.out.println("ID: " + user.getIdUser());
                 System.out.println("Nome: " + user.getUserName());
                 System.out.println("Email: " + user.getEmail());
+                System.out.println("Saldo: " + MenuUser.valueBalance(user.getAvailableBalance()));
 
             }
 
@@ -257,7 +257,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void updateUser() throws SQLException {
+    public static void updateUser() {
 
         try {
             System.out.println("Digite o ID do usuário que deseja editar: ");
@@ -277,7 +277,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void searchUserByID() throws SQLException {
+    public static void searchUserByID() {
 
         try {
 
@@ -299,7 +299,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void searchUserByName() throws SQLException {
+    public static void searchUserByName() {
 
         try {
 
@@ -319,7 +319,7 @@ public class MenuAdmin {
 
     // METODOS DOS LIVROS
 
-    public static void insertBook() throws SQLException {
+    public static void insertBook() {
 
         try {
             System.out.print("Autor do Livro: ");
@@ -338,7 +338,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getAllBooks() throws SQLException {
+    public static void getAllBooks() {
 
         try {
 
@@ -364,7 +364,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void updateBook() throws SQLException {
+    public static void updateBook(){
 
         try {
 
@@ -390,7 +390,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getBookByID() throws SQLException {
+    public static void getBookByID(){
 
         try {
             System.out.print("ID: ");
@@ -413,7 +413,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getBooksByTitle() throws SQLException {
+    public static void getBooksByTitle() {
 
         try {
 
@@ -435,7 +435,7 @@ public class MenuAdmin {
     }
 
     // Metodos de empréstimo
-    public static void createLoan() throws SQLException {
+    public static void createLoan() {
 
         try {
 
@@ -454,7 +454,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void returnLoan() throws SQLException {
+    public static void returnLoan() {
 
         try {
 
@@ -472,7 +472,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void updateLoan() throws SQLException {
+    public static void updateLoan() {
 
         try {
 
@@ -491,7 +491,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getAllLoans() throws SQLException {
+    public static void getAllLoans() {
 
         try {
 
@@ -507,7 +507,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getLoanByUser() throws SQLException {
+    public static void getLoanByUser() {
 
         try {
 
@@ -524,7 +524,7 @@ public class MenuAdmin {
         }
     }
 
-    public static void getLoanByID() throws SQLException {
+    public static void getLoanByID() {
 
         try {
 
@@ -541,18 +541,18 @@ public class MenuAdmin {
 
     public void runSystem() {
 
-        EstadoMenu estadoMenu = EstadoMenu.USERS;
+        AdminMenu adminMenu = AdminMenu.USERS;
 
-        while (estadoMenu != EstadoMenu.SAIR) {
+        while (adminMenu != AdminMenu.SAIR) {
 
             try {
 
-                estadoMenu = switch (estadoMenu) {
+                adminMenu = switch (adminMenu) {
 
                     case USERS -> menuUsers();
                     case BOOKS -> menuBooks();
                     case LOANS -> menuLoans();
-                    default -> EstadoMenu.SAIR;
+                    default -> AdminMenu.SAIR;
 
                 };
 

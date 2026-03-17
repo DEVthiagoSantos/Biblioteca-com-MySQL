@@ -6,7 +6,6 @@ import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
 
-import javax.swing.text.html.HTMLDocument;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,14 +55,15 @@ public class LoanDAO {
         }
     }
 
-    public void updateStatusLate(int idLoan, String status) throws SQLException {
+    public void updateStatusLate(Connection conn,
+            int idLoan,
+            Status status) throws SQLException {
 
         String sql = "UPDATE loans SET current_status = ? WHERE id_loan = ?";
 
-        try (Connection conn = Connect.connect();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, status.toUpperCase());
+            stmt.setString(1, status.name());
             stmt.setInt(2, idLoan);
 
             stmt.executeUpdate();
@@ -127,7 +127,10 @@ public class LoanDAO {
 
         String sql = """
                 SELECT * FROM loans
-                WHERE id_user = ? AND id_book = ? AND current_status = 'LOANED'
+                WHERE id_user = ?
+                AND id_book = ?
+                AND current_status = 'LOANED'
+                OR current_status = 'LATE'
                 """;
 
         return returnLoan(idUser, idBook, sql);
