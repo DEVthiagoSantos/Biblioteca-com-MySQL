@@ -25,7 +25,7 @@ public class LoanService {
     private final BookDAO bookDAO = new BookDAO();
     private final UserDAO userDAO = new UserDAO();
 
-    private final static BigInteger DAYS_LATE_FEE = BigInteger.valueOf(2);
+    private final static BigDecimal DAYS_LATE_FEE = new BigDecimal(2);
 
 
     public void createLoan(String userName, String bookTitle) throws SQLException {
@@ -62,6 +62,7 @@ public class LoanService {
                 LocalDateTime dateTime = LocalDateTime.now().plusDays(7);
                 LoanModel loanModel = new LoanModel(user, book, dateTime);
 
+                // Transactions
                 loanDAO.insert(conn, loanModel);
                 bookDAO.decreaseQuantity(conn, book.getIdBook());
 
@@ -82,9 +83,20 @@ public class LoanService {
 
         List<LoanModel> loanModel = loanDAO.findLateLoans(conn);
 
+        LocalDateTime now = LocalDateTime.now();
+
         for (LoanModel loan : loanModel) {
 
-            loanDAO.updateStatusLate(conn, loan.getIdLoan(), Status.LATE);
+            long lateDays = ChronoUnit.DAYS.between(loan.getExpected_return_date(), now);
+
+            if (lateDays > 0) {
+
+                BigDecimal value = new BigDecimal(lateDays)
+                        .multiply(DAYS_LATE_FEE);
+
+                loanDAO.updateStatusLate(conn, loan.getIdLoan(), value, Status.LATE);
+
+            }
 
         }
 
@@ -115,6 +127,19 @@ public class LoanService {
             conn.setAutoCommit(false);
 
             try {
+
+                BigDecimal lateFee = calculateLateFee(loan);
+
+                if (lateFee.compareTo(BigDecimal.ZERO) > 0) {
+
+                    if (user.getAvailableBalance().compareTo(lateFee) < 0) {
+
+                        throw new RuntimeException("Insufficient funds to pay fine");
+
+                    }
+
+                    userDAO.depitBalance(conn, user.getIdUser(), lateFee);
+                }
 
                 loanDAO.updateReturnDate(conn, loan.getIdLoan());
                 bookDAO.increaseQuantity(conn, book.getIdBook());
@@ -236,6 +261,28 @@ public class LoanService {
             throw new RuntimeException("The title cannot be left blank");
         }
 
+    }
+
+    static BigDecimal calculateLateFee(LoanModel loan) {
+
+
+        LocalDateTime expectedDate = loan.getExpected_return_date();
+
+        if (expectedDate == null) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (!expectedDate.isBefore(now)) {
+            return BigDecimal.ZERO;
+        }
+
+        long days = ChronoUnit.DAYS.between(expectedDate, now);
+
+        days = Math.max(1, days);
+
+        return DAYS_LATE_FEE.multiply(BigDecimal.valueOf(days));
     }
 
     static void verificationID(UserModel user, BookModel book) {

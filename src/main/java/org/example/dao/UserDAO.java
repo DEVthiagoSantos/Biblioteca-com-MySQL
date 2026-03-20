@@ -3,6 +3,7 @@ package org.example.dao;
 
 import org.example.connection.Connect;
 import org.example.model.UserModel;
+import org.example.response.PageResponse;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -36,7 +37,7 @@ public class UserDAO {
         List<UserModel> list = new ArrayList<>();
 
         try (Connection conn = Connect.connect();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
 
@@ -48,6 +49,23 @@ public class UserDAO {
         }
 
         return list;
+    }
+
+    public long countUsers(Connection conn) throws SQLException {
+
+        String sql = "SELECT COUNT(*) FROM users";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+        }
+
+        return 0;
     }
 
     // ROAD - ID
@@ -122,6 +140,20 @@ public class UserDAO {
             stmt.setInt(3, user.getIdUser());
             stmt.executeUpdate();
 
+        }
+    }
+
+    public void depitBalance(Connection conn,
+                             int idUser,
+                             BigDecimal lateFee) throws SQLException {
+
+        String sql = "UPDATE users SET available_balance = ? WHERE id_user = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBigDecimal(1, lateFee);
+            stmt.setInt(2, idUser);
+            stmt.executeUpdate();
         }
     }
 

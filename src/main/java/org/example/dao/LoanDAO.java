@@ -6,6 +6,7 @@ import org.example.model.BookModel;
 import org.example.model.LoanModel;
 import org.example.model.UserModel;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,15 +57,15 @@ public class LoanDAO {
     }
 
     public void updateStatusLate(Connection conn,
-            int idLoan,
-            Status status) throws SQLException {
+            int idLoan, BigDecimal value, Status status) throws SQLException {
 
-        String sql = "UPDATE loans SET current_status = ? WHERE id_loan = ?";
+        String sql = "UPDATE loans SET current_status = ?, late_fee = ? WHERE id_loan = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, status.name());
-            stmt.setInt(2, idLoan);
+            stmt.setBigDecimal(2,  value);
+            stmt.setInt(3, idLoan);
 
             stmt.executeUpdate();
         }
@@ -75,7 +76,8 @@ public class LoanDAO {
         String sql = """
                 UPDATE loans
                 SET actual_return_date = NOW(),
-                    current_status = 'RETURNED'
+                    current_status = 'RETURNED',
+                    late_fee = '0.00'
                 WHERE id_loan = ?""";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -100,9 +102,22 @@ public class LoanDAO {
     public List<LoanModel> findLateLoans(Connection conn) throws SQLException {
 
         String sql = """
-                SELECT id_loan FROM loans
+                SELECT loans.id_loan AS ID_Loan,
+                       users.id_user AS id_user,
+                       users.user_name AS user_name,
+                       books.id_book AS id_book,
+                       books.title AS title,
+                       books.author AS author,
+                       loans.loan_date AS loan_date,
+                       loans.expected_return_date AS return_date,
+                       loans.actual_return_date AS actual_return_date,
+                       loans.current_status AS status,
+                       loans.late_fee AS late_fee
+                FROM loans
+                INNER JOIN users ON loans.id_user = users.id_user
+                INNER JOIN books ON loans.id_book = books.id_book
                 WHERE expected_return_date < NOW()
-                AND current_status = 'LOANED'""";
+                AND current_status IN ('LOANED', 'LATE')""";
 
         List<LoanModel> lista = new ArrayList<>();
 
@@ -112,10 +127,7 @@ public class LoanDAO {
 
                 while (rs.next()) {
 
-                    LoanModel loanModel = new LoanModel();
-                    loanModel.setIdLoan(rs.getInt("id_loan"));
-
-                    lista.add(loanModel);
+                    lista.add(mapLoan(rs));
                 }
             }
         }
@@ -158,7 +170,8 @@ public class LoanDAO {
                        loans.loan_date AS loan_date,
                        loans.expected_return_date AS return_date,
                        loans.actual_return_date AS actual_return_date,
-                       loans.current_status AS status
+                       loans.current_status AS status,
+                       loans.late_fee AS late_fee
                 FROM loans
                 INNER JOIN users ON loans.id_user = users.id_user
                 INNER JOIN books ON loans.id_book = books.id_book
@@ -194,7 +207,8 @@ public class LoanDAO {
                        loans.loan_date AS loan_date,
                        loans.expected_return_date AS return_date,
                        loans.actual_return_date AS actual_return_date,
-                       loans.current_status AS status
+                       loans.current_status AS status,
+                       loans.late_fee AS late_fee
                 FROM loans
                 INNER JOIN users ON loans.id_user = users.id_user
                 INNER JOIN books ON loans.id_book = books.id_book
@@ -251,7 +265,8 @@ public class LoanDAO {
                        loans.loan_date AS loan_date,
                        loans.expected_return_date AS return_date,
                        loans.actual_return_date AS actual_return_date,
-                       loans.current_status AS status
+                       loans.current_status AS status,
+                       loans.late_fee AS late_fee
                 FROM loans
                 INNER JOIN users ON loans.id_user = users.id_user
                 INNER JOIN books ON loans.id_book = books.id_book""";
@@ -331,6 +346,7 @@ public class LoanDAO {
         loanModel.setBook(bookModel);
         loanModel.setUser(userModel);
         loanModel.setStatus(Status.valueOf(rs.getString("status")));
+        loanModel.setLateFee(rs.getBigDecimal("late_fee"));
 
         return loanModel;
     }
@@ -347,8 +363,13 @@ public class LoanDAO {
 
                 if (rs.next()) {
 
+                    // Achei o erro, esqueci de por a data no retorno
+
                     LoanModel loan = new LoanModel();
                     loan.setIdLoan(rs.getInt("id_loan"));
+                    LocalDateTime data = rs.getTimestamp("expected_return_date")
+                            .toLocalDateTime();
+                    loan.setExpected_return_date(data);
 
                     return loan;
                 }

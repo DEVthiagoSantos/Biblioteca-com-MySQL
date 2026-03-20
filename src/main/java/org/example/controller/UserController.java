@@ -6,13 +6,7 @@ import org.example.service.UserService;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UserController {
-
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+public record UserController(UserService userService) {
 
     public void createUser(String userName, String email) throws SQLException {
 

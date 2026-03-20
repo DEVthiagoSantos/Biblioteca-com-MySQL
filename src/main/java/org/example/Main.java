@@ -1,73 +1,76 @@
 package org.example;
 
-
-import org.example.acessMenu.MenuAdmin;
-import org.example.acessMenu.MenuUser;
+import javafx.application.Application;
+import javafx.scene.control.Button;
+import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.example.controller.UserController;
 import org.example.model.UserModel;
 import org.example.service.UserService;
 
-import java.sql.SQLException;
-import java.util.Scanner;
+import java.math.BigDecimal;
 
-public class Main {
+public class Main extends Application {
 
-    static UserService service = new UserService();
-    static UserController users = new UserController(service);
+    @Override
+    public void start(Stage stage) throws Exception {
 
-    public static void main(String[] args) throws SQLException {
+        UserController userController = new UserController(new UserService());
 
-        Scanner input = new Scanner(System.in);
+        TableView<UserModel> table = new TableView<>();
+        TableColumn<UserModel, Integer> idCol
+                = new TableColumn<>("ID");
+        idCol.setCellValueFactory(
+                new PropertyValueFactory<>("idUser"));
 
-        while (true) {
+        TableColumn<UserModel, String> userCol
+                = new TableColumn<>("Nome");
+        userCol.setCellValueFactory(
+                new PropertyValueFactory<>("userName")
+        );
 
-                String menu = """
-                    =============================
-                    [ 1 ] Login User
-                    [ 2 ] Login Admin
-                    [ 3 ] sair""";
+        TableColumn<UserModel, String> emailCol
+                = new TableColumn<>("Email");
+        emailCol.setCellValueFactory(
+                new PropertyValueFactory<>("email")
+        );
 
-                System.out.println(menu);
+        TableColumn<UserModel, BigDecimal> balanceCol =
+                new TableColumn<>("Saldo");
+        balanceCol.setCellValueFactory(
+                new PropertyValueFactory<>("availableBalance")
+        );
 
-                System.out.print("Escolha: ");
-                int opcao = Integer.parseInt(input.nextLine());
+        table.getColumns().addAll(idCol, userCol, emailCol, balanceCol);
 
-                if (opcao == 1) {
-                        System.out.print("ID do usuário: ");
-                        int idUser = Integer.parseInt(input.nextLine());
-                        try {
+        Button button = new Button("Listar Usuarios");
 
-                            UserModel userModel = users.searchUserById(idUser);
+        button.setOnAction(e -> {
+            try {
+                table.getItems().setAll(
+                        userController.getAllUsers()
+                );
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
 
-                            if (userModel != null) {
-                                MenuUser user = new MenuUser(idUser);
-                                user.runSystem();
-                            } else {
-                                System.out.println("Usuário não existe.");
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
+        VBox root = new VBox(button, table);
 
-                } else if (opcao == 2) {
+        Scene scene = new Scene(root, 400, 300);
 
-                        System.out.print("Senha do Admin: ");
-                        String senhaCorreta = "3131";
-                        // Vou mudar a senha apenas para demonstração kkkk
-                        String senha = input.nextLine();
+        stage.setTitle("Sistema Biblioteca");
+        stage.setScene(scene);
+        stage.show();
 
-                        if (senha.equals(senhaCorreta)) {
-                            MenuAdmin menuAdmin = new MenuAdmin();
-                            menuAdmin.runSystem();
-                        } else {
-                            System.out.println("Senha Incorreta.");
-                        }
-
-                } else if (opcao == 3) {
-                        break;
-                }
-
-        }
     }
 
+    public static void main(String[] args) {
+
+        launch();
+    }
 }

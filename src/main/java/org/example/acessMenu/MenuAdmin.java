@@ -1,6 +1,7 @@
 package org.example.acessMenu;
 
 import org.example.Enum.AdminMenu;
+import org.example.Enum.UserMenu;
 import org.example.controller.BookController;
 import org.example.controller.LoanController;
 import org.example.controller.UserController;
@@ -11,6 +12,7 @@ import org.example.service.BookService;
 import org.example.service.LoanService;
 import org.example.service.UserService;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Scanner;
@@ -43,6 +45,11 @@ public class MenuAdmin {
 
     public static void getLoan(LoanModel loan) {
 
+        String lateFee = "";
+        if (loan.getLateFee().compareTo(BigDecimal.ZERO) > 0) {
+            lateFee = "Taxa: " + MenuUser.valueBalance(loan.getLateFee()) + "\n";
+        }
+
         String data = returnActualDate(loan);
         String resultLoans = """
                     ID: %d
@@ -51,11 +58,11 @@ public class MenuAdmin {
                     Data do Empréstimo: %s
                     Data Limite de Retorno: %s
                     Data de Retorno: %s
-                    Status: %s""".formatted(loan.getIdLoan(),
+                    %sStatus: %s""".formatted(loan.getIdLoan(),
                 loan.getUser().getUserName(), loan.getBook().getTitle(),
                 loan.getLoanDate().format(formatter),
                 loan.getExpected_return_date().format(formatter),
-                data, loan.getStatus());
+                data, lateFee, loan.getStatus());
 
         linha();
         System.out.println(resultLoans);

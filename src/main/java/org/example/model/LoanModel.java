@@ -14,6 +14,7 @@ public class LoanModel {
     private LocalDateTime expected_return_date;
     private LocalDateTime actual_return_date;
     private Status status;
+    private BigDecimal lateFee;
 
     public LoanModel() {}
 
@@ -98,5 +99,13 @@ public class LoanModel {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public BigDecimal getLateFee() {
+        return lateFee;
+    }
+
+    public void setLateFee(BigDecimal lateFee) {
+        this.lateFee = lateFee;
     }
 }
